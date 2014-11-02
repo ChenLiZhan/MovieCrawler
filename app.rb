@@ -4,7 +4,7 @@ require 'json'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
-  RANK_LIST = { '1' => 'Latest', '2' => 'Second_round' }
+  RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
 
   helpers do
     def get_ranks(category)
