@@ -15,7 +15,7 @@ class MovieCrawlerApp < Sinatra::Base
       }
 
       category = params[:category]
-      ranks_after['rank'] = MovieCrawler::MovieInfo.get_table(category)
+      ranks_after['rank'] = MovieCrawler.get_table(category)
       ranks_after
     end
 
@@ -27,7 +27,7 @@ class MovieCrawlerApp < Sinatra::Base
       }
 
       category = params[:category]
-      infos_after['info'] = MovieCrawler::MovieInfo.movies_parser(category)
+      infos_after['info'] = MovieCrawler.movies_parser(category)
       infos_after
     end
   end
