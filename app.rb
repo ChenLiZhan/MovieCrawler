@@ -53,17 +53,17 @@ class MovieCrawlerApp < Sinatra::Base
 
   namespace '/api/v1' do
     get '/rank/:category.json' do
-      content_type :json
+      content_type :json, charset: 'utf-8'
       get_ranks(params[:category]).to_json
     end
 
     get '/info/:category.json' do
-      content_type :json
+      content_type :json, charset: 'utf-8'
       get_infos(params[:category]).to_json
     end
 
     post '/checktop' do
-      content_type :json
+      content_type :json, charset: 'utf-8'
       req = JSON.parse(request.body.read)
       n = req['top']
       topsum(n).to_json
