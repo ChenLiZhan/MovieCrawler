@@ -10,7 +10,9 @@ class MovieCrawlerApp < Sinatra::Base
 
   helpers do
     RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
+
     def get_ranks(category)
+      halt 404 if category.to_i > 3
       ranks_after = {
         'type' => 'rank_table',
         'category' => RANK_LIST[category],
@@ -23,15 +25,20 @@ class MovieCrawlerApp < Sinatra::Base
     end
 
     def get_infos(category)
-      infos_after = {
-        'type' => 'info_list',
-        'category' => category,
-        'info' => []
-      }
+      begin
+        infos_after = {
+          'type' => 'info_list',
+          'category' => category,
+          'info' => []
+        }
 
-      category = params[:category]
-      infos_after['info'] = MovieCrawler.movies_parser(category)
-      infos_after
+        category = params[:category]
+        infos_after['info'] = MovieCrawler.movies_parser(category)
+      rescue
+        halt 400
+      else
+        infos_after
+      end
     end
 
     def topsum(n)
@@ -66,7 +73,13 @@ class MovieCrawlerApp < Sinatra::Base
       content_type :json, charset: 'utf-8'
       req = JSON.parse(request.body.read)
       n = req['top']
+      halt 400 unless req.any?
+      halt 404 unless [*1..10].include? n
       topsum(n).to_json
+    end
+
+    get '/info/' do
+      halt 400
     end
   end
 end
