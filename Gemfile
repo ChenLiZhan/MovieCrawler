@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'sinatra', require: 'sinatra/base'
+gem 'sinatra'
 gem 'movie_crawler'
 gem 'json'
 gem 'sinatra-contrib'
