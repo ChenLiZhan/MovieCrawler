@@ -17,7 +17,7 @@ describe 'MovieCrawler debut' do
     it 'should return ok and json format' do
       get "/api/v1/rank/#{rand(1..3)}.json"
       last_response.must_be :ok?
-      # last_response.must_be_instance_of String
+      last_response.body.must_be_instance_of String
     end
 
     it 'should return 404 for unknown category' do
@@ -30,7 +30,7 @@ describe 'MovieCrawler debut' do
     it 'should return ok and json format' do
       get "/api/v1/info/#{info_helper.sample}.json"
       last_response.must_be :ok?
-      # last_response.must_be_instance_of String
+      last_response.body.must_be_instance_of String
     end
 
     it 'should return bad request if not specify category' do
