@@ -1,12 +1,13 @@
 require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
-require 'sinatra/namespace'
+# require 'sinatra/namespace'
+require_relative 'models/movie'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
 
-  register Sinatra::Namespace
+  # register Sinatra::Namespace
 
   helpers do
     RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
@@ -58,28 +59,28 @@ class MovieCrawlerApp < Sinatra::Base
     "It's working."
   end
 
-  namespace '/api/v1' do
-    get '/rank/:category.json' do
-      content_type :json, charset: 'utf-8'
-      get_ranks(params[:category]).to_json
-    end
-
-    get '/info/:category.json' do
-      content_type :json, charset: 'utf-8'
-      get_infos(params[:category]).to_json
-    end
-
-    post '/checktop' do
-      content_type :json, charset: 'utf-8'
-      req = JSON.parse(request.body.read)
-      n = req['top']
-      halt 400 unless req.any?
-      halt 404 unless [*1..10].include? n
-      topsum(n).to_json
-    end
-
-    get '/info/' do
-      halt 400
-    end
+  # namespace '/api/v1' do
+  get '/api/v1/rank/:category.json' do
+    content_type :json, charset: 'utf-8'
+    get_ranks(params[:category]).to_json
   end
+
+  get '/api/v1/info/:category.json' do
+    content_type :json, charset: 'utf-8'
+    get_infos(params[:category]).to_json
+  end
+
+  post '/api/v1/checktop' do
+    content_type :json, charset: 'utf-8'
+    req = JSON.parse(request.body.read)
+    n = req['top']
+    halt 400 unless req.any?
+    halt 404 unless [*1..10].include? n
+    topsum(n).to_json
+  end
+
+  get '/api/v1/info/' do
+    halt 400
+  end
+  # end
 end
