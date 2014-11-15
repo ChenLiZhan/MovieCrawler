@@ -8,6 +8,8 @@ gem 'json'
 gem 'activerecord'
 gem 'sinatra-activerecord'
 
+gem 'haml'
+
 group :development do
   gem 'sqlite3'
   gem 'tux'

@@ -20,6 +20,8 @@ GEM
     builder (3.2.2)
     domain_name (0.5.22)
       unf (>= 0.0.5, < 1.0.0)
+    haml (4.0.5)
+      tilt
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.6.11)
@@ -96,6 +98,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  haml
   json
   minitest
   movie_crawler

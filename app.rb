@@ -2,10 +2,11 @@ require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
 require 'sinatra/namespace'
+require 'haml'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
-
+  set :views, Proc.new { File.join(root, "views") }
   register Sinatra::Namespace
 
   helpers do
@@ -55,7 +56,7 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   get '/' do
-    "It's working."
+    haml :home
   end
 
   namespace '/api/v1' do
