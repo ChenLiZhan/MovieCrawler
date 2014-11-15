@@ -3,6 +3,8 @@ require 'movie_crawler'
 require 'json'
 require 'sinatra/namespace'
 require 'haml'
+require 'yaml'
+require_relative 'model/movie'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
@@ -12,6 +14,18 @@ class MovieCrawlerApp < Sinatra::Base
   helpers do
     RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
 
+    def get_movie_info(moviename)
+      # begin
+        movie_crawled={
+          'type' => 'movie_info',
+          'info' => []
+        }
+
+        # moviename = params[:moviename]
+        movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
+        movie_crawled
+    end
+
     def get_ranks(category)
       halt 404 if category.to_i > 3
       ranks_after = {
@@ -20,7 +34,7 @@ class MovieCrawlerApp < Sinatra::Base
         'rank' => []
       }
 
-      category = params[:category]
+      # category = params[:category]
       ranks_after['rank'] = MovieCrawler.get_table(category)
       ranks_after
     end
@@ -33,7 +47,7 @@ class MovieCrawlerApp < Sinatra::Base
           'info' => []
         }
 
-        category = params[:category]
+        # category = params[:category]
         infos_after['info'] = MovieCrawler.movies_parser(category)
       rescue
         halt 400
@@ -60,6 +74,12 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   namespace '/api/v1' do
+
+    get '/movie/:name.json' do
+      content_type :json, charset: 'utf-8'
+      get_movie_info(params[:name]).to_json
+    end
+
     get '/rank/:category.json' do
       content_type :json, charset: 'utf-8'
       get_ranks(params[:category]).to_json
