@@ -2,15 +2,37 @@ require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
 # require 'sinatra/namespace'
+<<<<<<< HEAD
 require_relative 'models/movie'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
 
+=======
+require 'haml'
+require 'yaml'
+require_relative 'model/movie'
+
+# web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
+class MovieCrawlerApp < Sinatra::Base
+  set :views, Proc.new { File.join(root, "views") }
+>>>>>>> feature/model
   # register Sinatra::Namespace
 
   helpers do
     RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
+
+    def get_movie_info(moviename)
+      # begin
+        movie_crawled={
+          'type' => 'movie_info',
+          'info' => []
+        }
+
+        # moviename = params[:moviename]
+        movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
+        movie_crawled
+    end
 
     def get_ranks(category)
       halt 404 if category.to_i > 3
@@ -20,7 +42,7 @@ class MovieCrawlerApp < Sinatra::Base
         'rank' => []
       }
 
-      category = params[:category]
+      # category = params[:category]
       ranks_after['rank'] = MovieCrawler.get_table(category)
       ranks_after
     end
@@ -33,7 +55,7 @@ class MovieCrawlerApp < Sinatra::Base
           'info' => []
         }
 
-        category = params[:category]
+        # category = params[:category]
         infos_after['info'] = MovieCrawler.movies_parser(category)
       rescue
         halt 400
@@ -56,14 +78,48 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   get '/' do
-    "It's working."
+    haml :home
   end
 
+  get '/movie/:name.json' do
+    content_type :json, charset: 'utf-8'
+
+    if Movie.find_by(moviename: params[:name])
+      # return "find"+params[:name]
+      redirect "/moviechecked/#{params[:name]}"
+    else
+      movie = Movie.new
+      movie.moviename = params[:name]
+      movie.movieinfo = get_movie_info(params[:name]).to_json
+      movie.save
+      movie.movieinfo
+    end
+  end
+
+<<<<<<< HEAD
   # namespace '/api/v1' do
   get '/api/v1/rank/:category.json' do
     content_type :json, charset: 'utf-8'
     get_ranks(params[:category]).to_json
   end
+=======
+
+  get '/moviechecked/:moviename' do
+    content_type :json, charset: 'utf-8'
+
+    @movie = Movie.find_by(moviename: params[:moviename])
+    return @movie.movieinfo
+
+  end
+  # # namespace '/api/v1' do
+
+
+
+    get '/rank/:category.json' do
+      content_type :json, charset: 'utf-8'
+      get_ranks(params[:category]).to_json
+    end
+>>>>>>> feature/model
 
   get '/api/v1/info/:category.json' do
     content_type :json, charset: 'utf-8'
@@ -79,8 +135,14 @@ class MovieCrawlerApp < Sinatra::Base
     topsum(n).to_json
   end
 
+<<<<<<< HEAD
   get '/api/v1/info/' do
     halt 400
   end
+=======
+    get '/info/' do
+      halt 400
+    end
+>>>>>>> feature/model
   # end
 end
