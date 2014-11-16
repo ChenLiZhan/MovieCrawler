@@ -73,12 +73,15 @@ class MovieCrawlerApp < Sinatra::Base
     haml :home
   end
 
-  get '/movie/:name.json' do
+
+  # # namespace '/api/v1' do
+
+  get '/api/v2/movie/:name.json' do
     content_type :json, charset: 'utf-8'
 
     if Movie.find_by(moviename: params[:name])
       # return "find"+params[:name]
-      redirect "/moviechecked/#{params[:name]}"
+      redirect "/api/v2/moviechecked/#{params[:name]}"
     else
       movie = Movie.new
       movie.moviename = params[:name]
@@ -90,28 +93,24 @@ class MovieCrawlerApp < Sinatra::Base
 
 
 
-  get '/moviechecked/:moviename' do
+  get '/api/v2/moviechecked/:moviename' do
     content_type :json, charset: 'utf-8'
-
     @movie = Movie.find_by(moviename: params[:moviename])
     return @movie.movieinfo
-
   end
-  # # namespace '/api/v1' do
 
 
+  get '/api/v2/rank/:category.json' do
+    content_type :json, charset: 'utf-8'
+    get_ranks(params[:category]).to_json
+  end
 
-    get '/rank/:category.json' do
-      content_type :json, charset: 'utf-8'
-      get_ranks(params[:category]).to_json
-    end
-
-  get '/api/v1/info/:category.json' do
+  get '/api/v2/info/:category.json' do
     content_type :json, charset: 'utf-8'
     get_infos(params[:category]).to_json
   end
 
-  post '/api/v1/checktop' do
+  post '/api/v2/checktop' do
     content_type :json, charset: 'utf-8'
     req = JSON.parse(request.body.read)
     n = req['top']
