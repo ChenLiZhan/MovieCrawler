@@ -73,12 +73,15 @@ class MovieCrawlerApp < Sinatra::Base
     haml :home
   end
 
+  get '/movie/:name.json' do
+    content_type :json, charset: 'utf-8'
+    get_movie_info(params[:name]).to_json
+  end
+
+
   namespace '/api/v1' do
 
-    get '/movie/:name.json' do
-      content_type :json, charset: 'utf-8'
-      get_movie_info(params[:name]).to_json
-    end
+
 
     get '/rank/:category.json' do
       content_type :json, charset: 'utf-8'
