@@ -2,13 +2,6 @@ require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
 # require 'sinatra/namespace'
-<<<<<<< HEAD
-require_relative 'models/movie'
-
-# web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
-class MovieCrawlerApp < Sinatra::Base
-
-=======
 require 'haml'
 require 'yaml'
 require_relative 'model/movie'
@@ -16,7 +9,6 @@ require_relative 'model/movie'
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
   set :views, Proc.new { File.join(root, "views") }
->>>>>>> feature/model
   # register Sinatra::Namespace
 
   helpers do
@@ -96,13 +88,7 @@ class MovieCrawlerApp < Sinatra::Base
     end
   end
 
-<<<<<<< HEAD
-  # namespace '/api/v1' do
-  get '/api/v1/rank/:category.json' do
-    content_type :json, charset: 'utf-8'
-    get_ranks(params[:category]).to_json
-  end
-=======
+
 
   get '/moviechecked/:moviename' do
     content_type :json, charset: 'utf-8'
@@ -119,7 +105,6 @@ class MovieCrawlerApp < Sinatra::Base
       content_type :json, charset: 'utf-8'
       get_ranks(params[:category]).to_json
     end
->>>>>>> feature/model
 
   get '/api/v1/info/:category.json' do
     content_type :json, charset: 'utf-8'
@@ -135,14 +120,9 @@ class MovieCrawlerApp < Sinatra::Base
     topsum(n).to_json
   end
 
-<<<<<<< HEAD
-  get '/api/v1/info/' do
-    halt 400
-  end
-=======
+
     get '/info/' do
       halt 400
     end
->>>>>>> feature/model
   # end
 end
