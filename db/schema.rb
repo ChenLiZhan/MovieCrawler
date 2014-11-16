@@ -11,11 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141116074115) do
+ActiveRecord::Schema.define(version: 20141116122713) do
 
   create_table "movies", force: true do |t|
     t.text "moviename"
     t.text "movieinfo"
+  end
+
+  create_table "theaters", force: true do |t|
+    t.string "type"
+    t.string "category"
+    t.text   "content"
   end
 
 end
