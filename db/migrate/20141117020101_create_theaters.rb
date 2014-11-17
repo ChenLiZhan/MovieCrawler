@@ -1,7 +1,7 @@
 class CreateTheaters < ActiveRecord::Migration
   def self.up
     create_table :theaters do |t|
-      t.string :type
+      t.string :content_type
       t.string :category
       t.text :content
     end
