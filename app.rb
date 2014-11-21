@@ -41,6 +41,7 @@ class MovieCrawlerApp < Sinatra::Base
     end
 
     def get_infos(category)
+      halt 404 if category == nil?
       infos_after = {
         'content_type' => 'info_list',
         'category' => category,
@@ -49,10 +50,7 @@ class MovieCrawlerApp < Sinatra::Base
 
       # category = params[:category]
       infos_after['content'] = MovieCrawler.movies_parser(category)
-      rescue
-        halt 400
-      else
-        infos_after
+      infos_after
     end
 
     def topsum(n)
@@ -102,15 +100,15 @@ class MovieCrawlerApp < Sinatra::Base
       @data = {
         'content_type' => @data.content_type,
         'category' => @data.category,
-        'info' => @data.content
+        'info' => JSON.parse(@data.content)
       }
       @data.to_json
     else
       data = params[:type] == 'info' ? get_infos(params[:category]) : \
       get_ranks(params[:category])
       theater = Theater.new
-      theater.content_type = data['content_type'].to_json
-      theater.category = data['category'].to_json
+      theater.content_type = data['content_type']
+      theater.category = data['category']
       theater.content = data['content'].to_json
       theater.save && data.to_json
     end

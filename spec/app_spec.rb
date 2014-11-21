@@ -13,29 +13,39 @@ describe 'MovieCrawler debut' do
     end
   end
 
-  describe 'Getting the rank_table' do
+  describe 'Getting the rank and info' do
+    before do
+      Theater.delete_all
+    end
+
     it 'should return ok and json format' do
-      get "/api/v1/rank/#{rand(1..3)}.json"
+      get "/api/v2/rank/#{rand(1..3)}.json"
       last_response.must_be :ok?
-      last_response.body.must_be_instance_of String
+      data = last_response.body
+      saved_theater = Theater.find_by(content_type: 'rank_table')
+      %w(1 2 3).must_include saved_theater[:category]
+      JSON.parse(data)['content'].must_equal JSON.parse(saved_theater[:content])
     end
 
     it 'should return 404 for unknown category' do
-      get "/api/v1/rank/#{rand(4..100)}.json"
+      get "/api/v2/rank/#{rand(4..100)}.json"
       last_response.must_be :not_found?
+      Theater.find_by(content_type: 'rank_table').must_be_nil
     end
-  end
 
-  describe 'Getting the info_list' do
     it 'should return ok and json format' do
-      get "/api/v1/info/#{info_helper.sample}.json"
+      get "/api/v2/info/#{info_helper.sample}.json"
       last_response.must_be :ok?
-      last_response.body.must_be_instance_of String
+      data = last_response.body
+      saved_theater = Theater.find_by(content_type: 'info_list')
+      info_helper.must_include saved_theater[:category]
+      JSON.parse(data)['content'].must_equal JSON.parse(saved_theater[:content])
     end
 
     it 'should return bad request if not specify category' do
-      get '/api/v1/info/'
-      last_response.must_be :bad_request?
+      get '/api/v2/info/'
+      last_response.must_be :not_found?
+      Theater.find_by(content_type: 'info_list').must_be_nil
     end
   end
 
@@ -44,7 +54,7 @@ describe 'MovieCrawler debut' do
       header = { 'Content-type' => 'application/json' }
       body = { top: 3 }
 
-      post '/api/v1/checktop', body.to_json, header
+      post '/api/v2/checktop', body.to_json, header
       last_response.must_be :ok?
       last_response.must_be_instance_of Rack::MockResponse
     end
@@ -53,7 +63,7 @@ describe 'MovieCrawler debut' do
       header = { 'Content-type' => 'application/json' }
       body = { top: rand(11..100) }
 
-      post '/api/v1/checktop', body.to_json, header
+      post '/api/v2/checktop', body.to_json, header
       last_response.must_be :not_found?
     end
 
@@ -61,7 +71,7 @@ describe 'MovieCrawler debut' do
       header = { 'Content-type' => 'application/json' }
       body = {}
 
-      post '/api/v1/checktop', body.to_json, header
+      post '/api/v2/checktop', body.to_json, header
       last_response.must_be :bad_request?
     end
   end
