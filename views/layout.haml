@@ -1,0 +1,15 @@
+!!! 5
+%html
+  %head
+    %title MovieCrawler information
+    %link{href: '/style.css', media: 'screen, projection', rel: 'stylesheet'}
+  %body
+    %header
+      = haml :nav
+    %section
+      = styled_flash
+      = yield
+    %sidebar
+      = haml :sidebar
+    .footer
+      = haml :footer
