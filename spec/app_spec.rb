@@ -6,6 +6,7 @@ describe 'MovieCrawler debut' do
 
   include DebutHelpers
 
+  # check routes
   describe 'Getting the root of MovieCrawler' do
     it 'should return ok' do
       get '/'
@@ -13,6 +14,30 @@ describe 'MovieCrawler debut' do
     end
   end
 
+  # check movie_info
+  describe 'Checking get_movie_info' do
+
+    it 'shoule find checked movies' do
+      get '/api/v2/movie/spiderman.json'
+
+      if last_response.must_be :redirect?
+        follow_redirect!
+        last_request.url.must_match /api\/v2\/moviechecked\/\w+/
+      end
+
+      if last_response.must_be :ok?
+      end
+    end
+
+
+    it 'should return 404 for unknown movies' do
+      get "api/v2/movie/.json"
+      last_response.must_be :not_found?
+    end
+
+  end
+
+  # methods get_ranks and get_infos
   describe 'Getting the rank and info' do
     before do
       Theater.delete_all
@@ -49,6 +74,7 @@ describe 'MovieCrawler debut' do
     end
   end
 
+  # method topsum
   describe 'Checking the top n among three rank' do
     it 'should return ok and json format' do
       header = { 'Content-type' => 'application/json' }

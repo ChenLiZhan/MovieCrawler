@@ -20,6 +20,7 @@ class MovieCrawlerApp < Sinatra::Base
 
     def get_movie_info(moviename)
       # begin
+        # halt 404 if moviename == nil?
         movie_crawled={
           'type' => 'movie_info',
           'info' => []
@@ -104,6 +105,7 @@ class MovieCrawlerApp < Sinatra::Base
 
   get '/api/v2/moviechecked/:moviename' do
     content_type :json, charset: 'utf-8'
+
     @movie = Movie.find_by(moviename: params[:moviename])
     return @movie.movieinfo
   end
