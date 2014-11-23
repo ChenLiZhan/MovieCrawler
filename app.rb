@@ -17,6 +17,7 @@ class MovieCrawlerApp < Sinatra::Base
 
     def get_movie_info(moviename)
       # begin
+        halt 404 if moviename.is_a?
         movie_crawled={
           'type' => 'movie_info',
           'info' => []

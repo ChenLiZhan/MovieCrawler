@@ -6,11 +6,6 @@ describe 'MovieCrawler debut' do
 
   include DebutHelpers
 
-  describe 'Checking get_movie_info' do
-  end
-
-
-
   # check routes
   describe 'Getting the root of MovieCrawler' do
     it 'should return ok' do
@@ -19,6 +14,20 @@ describe 'MovieCrawler debut' do
     end
   end
 
+  # check movie_info
+  describe 'Checking get_movie_info' do
+
+    it 'shoule find checked movies' do
+      get '/api/v2/movie/superman.json'
+      last_response.must_be :ok?
+    end
+
+    it 'should return 404 for unknown movies' do
+      get "api/v2/movie/#{random_str(20)}.json"
+      last_response.must_be :not_found?
+    end
+
+  end
 
   # methods get_ranks and get_infos
   describe 'Getting the rank and info' do
