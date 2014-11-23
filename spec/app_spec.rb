@@ -20,13 +20,11 @@ describe 'MovieCrawler debut' do
     it 'shoule find checked movies' do
       get '/api/v2/movie/spiderman.json'
 
-      if last_response.must_be :redirect?
-        follow_redirect!
-        last_request.url.must_match /api\/v2\/moviechecked\/\w+/
-      end
+      last_response.must_be :redirect?
+      follow_redirect!
+      last_request.url.must_match /api\/v2\/moviechecked\/\w+/
 
-      if last_response.must_be :ok?
-      end
+      last_response.must_be :ok?
     end
 
 
