@@ -1,6 +1,8 @@
 require_relative 'spec_helper'
 require_relative 'support/debut_helpers'
 require 'json'
+require_relative '../model/movie'
+require_relative '../model/theater'
 
 describe 'MovieCrawler debut' do
 
@@ -20,11 +22,13 @@ describe 'MovieCrawler debut' do
     it 'shoule find checked movies' do
       get '/api/v2/movie/spiderman.json'
 
-      last_response.must_be :redirect?
-      follow_redirect!
-      last_request.url.must_match /api\/v2\/moviechecked\/\w+/
-
-      last_response.must_be :ok?
+      if Movie.find_by(moviename: 'spiderman')
+        last_response.must_be :redirect?
+        follow_redirect!
+        last_request.url.must_match /api\/v2\/moviechecked\/\w+/
+      else
+        last_response.must_be :ok?
+      end
     end
 
 
