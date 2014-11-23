@@ -23,7 +23,6 @@ describe 'MovieCrawler debut' do
       get '/api/v2/movie/spiderman.json'
 
       if Movie.find_by(moviename: 'spiderman')
-        last_response.must_be :redirect?
         follow_redirect!
         last_request.url.must_match /api\/v2\/moviechecked\/\w+/
       else
