@@ -9,6 +9,7 @@ gem 'activerecord'
 gem 'sinatra-activerecord'
 
 gem 'haml'
+gem 'sinatra-simple-navigation'
 
 group :development do
   gem 'sqlite3'
