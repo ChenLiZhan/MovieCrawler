@@ -18,12 +18,20 @@ describe 'MovieCrawler debut' do
   describe 'Checking get_movie_info' do
 
     it 'shoule find checked movies' do
-      get '/api/v2/movie/superman.json'
-      last_response.must_be :ok?
+      get '/api/v2/movie/spiderman.json'
+
+      if last_response.must_be :redirect?
+        follow_redirect!
+        last_request.url.must_match /api\/v2\/moviechecked\/\w+/
+      end
+
+      if last_response.must_be :ok?
+      end
     end
 
+
     it 'should return 404 for unknown movies' do
-      get "api/v2/movie/#{random_str(20)}.json"
+      get "api/v2/movie/.json"
       last_response.must_be :not_found?
     end
 
