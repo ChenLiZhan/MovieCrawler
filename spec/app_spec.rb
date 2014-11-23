@@ -6,6 +6,12 @@ describe 'MovieCrawler debut' do
 
   include DebutHelpers
 
+  describe 'Checking get_movie_info' do
+  end
+
+
+
+  # check routes
   describe 'Getting the root of MovieCrawler' do
     it 'should return ok' do
       get '/'
@@ -13,6 +19,8 @@ describe 'MovieCrawler debut' do
     end
   end
 
+
+  # methods get_ranks and get_infos
   describe 'Getting the rank and info' do
     before do
       Theater.delete_all
@@ -49,6 +57,7 @@ describe 'MovieCrawler debut' do
     end
   end
 
+  # method topsum
   describe 'Checking the top n among three rank' do
     it 'should return ok and json format' do
       header = { 'Content-type' => 'application/json' }
