@@ -5,6 +5,7 @@ require 'json'
 require 'haml'
 require 'yaml'
 require_relative 'model/movie'
+require_relative 'model/theater'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
@@ -29,7 +30,7 @@ class MovieCrawlerApp < Sinatra::Base
     def get_ranks(category)
       halt 404 if category.to_i > 3
       ranks_after = {
-        'type' => 'rank_table',
+        'content_type' => 'rank_table',
         'category' => category,
         'content' => []
       }
@@ -40,18 +41,16 @@ class MovieCrawlerApp < Sinatra::Base
     end
 
     def get_infos(category)
+      halt 404 if category == nil?
       infos_after = {
-        'type' => 'info_list',
+        'content_type' => 'info_list',
         'category' => category,
         'content' => []
       }
 
       # category = params[:category]
       infos_after['content'] = MovieCrawler.movies_parser(category)
-      rescue
-        halt 400
-      else
-        infos_after
+      infos_after
     end
 
     def topsum(n)
@@ -99,22 +98,19 @@ class MovieCrawlerApp < Sinatra::Base
 
     if @data = Theater.find_by(category: params[:category])
       @data = {
-        'type' => @data.type,
+        'content_type' => @data.content_type,
         'category' => @data.category,
-        'info' => @data.content
+        'info' => JSON.parse(@data.content)
       }
       @data.to_json
     else
       data = params[:type] == 'info' ? get_infos(params[:category]) : \
       get_ranks(params[:category])
       theater = Theater.new
-      theater.type = data['type'].to_json
-      theater.category = data['category'].to_json
+      theater.content_type = data['content_type']
+      theater.category = data['category']
       theater.content = data['content'].to_json
-      if theater.save
-        status 201
-        data.to_json
-      end
+      theater.save && data.to_json
     end
   end
 
