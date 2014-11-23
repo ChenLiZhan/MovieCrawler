@@ -1,15 +1,18 @@
 require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
+require 'yaml'
 # require 'sinatra/namespace'
 require 'haml'
-require 'yaml'
+require 'sinatra/simple-navigation'
 require_relative 'model/movie'
 require_relative 'model/theater'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
   set :views, Proc.new { File.join(root, "views") }
+  register Sinatra::SimpleNavigation
+  SimpleNavigation.config_file_paths << File.expand_path('../config', __FILE__)
   # register Sinatra::Namespace
 
   helpers do
@@ -70,6 +73,18 @@ class MovieCrawlerApp < Sinatra::Base
 
   get '/' do
     haml :home
+  end
+
+  get '/info/:category' do
+    @intros = get_infos(params[:category])
+
+    haml :intro
+  end
+
+  get '/rank/:category' do
+    @boxoffices = get_ranks(params[:category])
+
+    haml :boxoffice
   end
 
   # # namespace '/api/v1' do
