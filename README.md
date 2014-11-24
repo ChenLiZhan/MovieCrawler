@@ -12,7 +12,7 @@ There are several APIs you can use
 
 + Top 10 information:
 
-        https://movie-crawler.herokuapp.com/api/v1/rank/(category).json
+        https://movie-crawler.herokuapp.com/api/v2/rank/(category).json
 
   You have three choices to replace the ```(category)``` part.
   1. use ```1``` to get the top 10 popular movies in U.S. area.
@@ -22,7 +22,7 @@ There are several APIs you can use
   *Ex:*
   If I would like to get the top ten popular movies in Taiwan, then I could access
 
-          https://movie-crawler.herokuapp.com/api/v1/rank/2.json
+          https://movie-crawler.herokuapp.com/api/v2/rank/2.json
 
   The result will reach to you just-in-time.
 
@@ -32,15 +32,23 @@ There are several APIs you can use
 
   with
 
-      curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"top\":3}"  http://movie-crawler.herokuapp.com/api/v1/checktop
+      curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "{\"top\":3}"  http://movie-crawler.herokuapp.com/api/v2/checktop
 
   Only one command, the api will return you with the top 3 most popular movie in the three list all at once. Sounds interesting? Have a try!
 
 + To get informaiton of the latest or second round movies available in Taiwan:
   1. If you want take a look at the latest movies. Please access
 
-          https://movie-crawler.herokuapp.com/api/v1/info/latest.json
+          https://movie-crawler.herokuapp.com/api/v2/info/latest.json
 
   2. If you want know the informations of the second-round ones.
 
-          https://movie-crawler.herokuapp.com/api/v1/info/seond_round.json
+          https://movie-crawler.herokuapp.com/api/v2/info/seond_round.json
+
+  new in v2
+
++ To get the specific information of some movie, including crew, comments and others:
+
+  If you want check superman
+
+        https://movie-crawler.herokuapp.com/api/v2/movie/superman.json

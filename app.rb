@@ -1,44 +1,60 @@
 require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
-require 'sinatra/namespace'
+require 'yaml'
+# require 'sinatra/namespace'
+require 'haml'
+require 'sinatra/simple-navigation'
+require_relative 'model/movie'
+require_relative 'model/theater'
 
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
-
-  register Sinatra::Namespace
+  set :views, Proc.new { File.join(root, "views") }
+  register Sinatra::SimpleNavigation
+  SimpleNavigation.config_file_paths << File.expand_path('../config', __FILE__)
+  # register Sinatra::Namespace
 
   helpers do
-    RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
+    # RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
+
+    def get_movie_info(moviename)
+      # begin
+        # halt 404 if moviename == nil?
+        movie_crawled={
+          'type' => 'movie_info',
+          'info' => []
+        }
+
+        # moviename = params[:moviename]
+        movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
+        movie_crawled
+    end
 
     def get_ranks(category)
       halt 404 if category.to_i > 3
       ranks_after = {
-        'type' => 'rank_table',
-        'category' => RANK_LIST[category],
-        'rank' => []
+        'content_type' => 'rank_table',
+        'category' => category,
+        'content' => []
       }
 
-      category = params[:category]
-      ranks_after['rank'] = MovieCrawler.get_table(category)
+      # category = params[:category]
+      ranks_after['content'] = MovieCrawler.get_table(category)
       ranks_after
     end
 
     def get_infos(category)
-      begin
-        infos_after = {
-          'type' => 'info_list',
-          'category' => category,
-          'info' => []
-        }
+      halt 404 if category == nil?
+      infos_after = {
+        'content_type' => 'info_list',
+        'category' => category,
+        'content' => []
+      }
 
-        category = params[:category]
-        infos_after['info'] = MovieCrawler.movies_parser(category)
-      rescue
-        halt 400
-      else
-        infos_after
-      end
+      # category = params[:category]
+      infos_after['content'] = MovieCrawler.movies_parser(category)
+      infos_after
     end
 
     def topsum(n)
@@ -55,31 +71,77 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   get '/' do
-    "It's working."
+    haml :home
   end
 
-  namespace '/api/v1' do
-    get '/rank/:category.json' do
-      content_type :json, charset: 'utf-8'
-      get_ranks(params[:category]).to_json
-    end
+  get '/info/:category' do
+    @intros = get_infos(params[:category])
 
-    get '/info/:category.json' do
-      content_type :json, charset: 'utf-8'
-      get_infos(params[:category]).to_json
-    end
+    haml :intro
+  end
 
-    post '/checktop' do
-      content_type :json, charset: 'utf-8'
-      req = JSON.parse(request.body.read)
-      n = req['top']
-      halt 400 unless req.any?
-      halt 404 unless [*1..10].include? n
-      topsum(n).to_json
-    end
+  get '/rank/:category' do
+    @boxoffices = get_ranks(params[:category])
 
-    get '/info/' do
-      halt 400
+    haml :boxoffice
+  end
+
+  # # namespace '/api/v1' do
+
+  get '/api/v2/movie/:name.json' do
+    content_type :json, charset: 'utf-8'
+
+    if Movie.find_by(moviename: params[:name])
+      # return "find"+params[:name]
+      redirect "/api/v2/moviechecked/#{params[:name]}"
+    else
+      movie = Movie.new
+      movie.moviename = params[:name]
+      movie.movieinfo = get_movie_info(params[:name]).to_json
+      movie.save
+      movie.movieinfo
     end
   end
+
+  get '/api/v2/moviechecked/:moviename' do
+    content_type :json, charset: 'utf-8'
+
+    @movie = Movie.find_by(moviename: params[:moviename])
+    return @movie.movieinfo
+  end
+
+  get '/api/v2/:type/:category.json' do
+    content_type :json, charset: 'utf-8'
+
+    if @data = Theater.find_by(category: params[:category])
+      @data = {
+        'content_type' => @data.content_type,
+        'category' => @data.category,
+        'info' => JSON.parse(@data.content)
+      }
+      @data.to_json
+    else
+      data = params[:type] == 'info' ? get_infos(params[:category]) : \
+      get_ranks(params[:category])
+      theater = Theater.new
+      theater.content_type = data['content_type']
+      theater.category = data['category']
+      theater.content = data['content'].to_json
+      theater.save && data.to_json
+    end
+  end
+
+  post '/api/v2/checktop' do
+    content_type :json, charset: 'utf-8'
+    req = JSON.parse(request.body.read)
+    n = req['top']
+    halt 400 unless req.any?
+    halt 404 unless [*1..10].include? n
+    topsum(n).to_json
+  end
+
+  get '/info/' do
+    halt 400
+  end
+  # end
 end
