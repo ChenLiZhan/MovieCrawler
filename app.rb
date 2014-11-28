@@ -11,9 +11,14 @@ require_relative 'model/theater'
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
   set :views, Proc.new { File.join(root, "views") }
+  enable :sessions
+  register Sinatra::Flash
+  use Rack::MethodOverride
   register Sinatra::SimpleNavigation
   SimpleNavigation.config_file_paths << File.expand_path('../config', __FILE__)
   # register Sinatra::Namespace
+
+  API_BASE_URI = 'http://localhost:9292'
 
   helpers do
     # RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
@@ -26,7 +31,6 @@ class MovieCrawlerApp < Sinatra::Base
           'info' => []
         }
 
-        # moviename = params[:moviename]
         movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
         movie_crawled
     end
@@ -39,7 +43,6 @@ class MovieCrawlerApp < Sinatra::Base
         'content' => []
       }
 
-      # category = params[:category]
       ranks_after['content'] = MovieCrawler.get_table(category)
       ranks_after
     end
@@ -52,7 +55,6 @@ class MovieCrawlerApp < Sinatra::Base
         'content' => []
       }
 
-      # category = params[:category]
       infos_after['content'] = MovieCrawler.movies_parser(category)
       infos_after
     end
@@ -84,6 +86,56 @@ class MovieCrawlerApp < Sinatra::Base
     @boxoffices = get_ranks(params[:category])
 
     haml :boxoffice
+  end
+
+  get '/movie' do
+    @action = :create
+    haml :movie
+  end
+
+  post '/movie' do
+    if params[:movie].split(/[\r\n\s]/).length > 1
+      flash[:notice] = 'One movie at a time, take easy!'
+      redirect '/movie'
+      return nil
+    end
+
+    movie = params[:movie].strip
+    request_url = "#{API_BASE_URI}/api/v2/movie/#{movie}"
+    result = HTTParty.get(request_url)
+
+    if (result.code != 200)
+      flash[:notice] = 'Movie not found'
+      redirect '/movie'
+      return nil
+    end
+
+    session[:result] = result.to_json
+    session[:movie] = movie
+    session[:action] = :create
+    redirect "/movie/#{movie}"
+  end
+
+  get '/movie/:movie' do
+    if session[:action] == :create
+      @results = JSON.parse(session[:result])
+      @movie = session[:movie]
+    else
+      request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}"
+      result = HTTParty.get(request_url)
+      @results = result
+      @movie = params[:movie]
+    end
+
+    @action = :update
+    haml :movie
+  end
+
+  delete '/movie/:movie' do
+    request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}"
+    result = HTTParty.delete(request_url)
+    flash[:notice] = 'Record of movie deleted'
+    redirect '/movie'
   end
 
   # # namespace '/api/v1' do
