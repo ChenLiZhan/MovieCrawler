@@ -19,15 +19,15 @@ describe 'MovieCrawler debut' do
   # check movie_info
   describe 'Checking get_movie_info' do
 
-    it 'shoule find checked movies' do
-      if Movie.find_by(moviename: 'spiderman')
-        get 'api/v2/moviechecked/spiderman'
-        last_response.must_be :ok?
-      else
-        get '/api/v2/movie/spiderman.json'
-        last_response.must_be :ok?
-      end
-    end
+    # it 'shoule find checked movies' do
+    #   if Movie.find_by(moviename: 'spiderman')
+    #     get 'api/v2/movie/spiderman.json'
+    #     last_response.must_be :ok?
+    #   else
+    #     get '/api/v2/movie/spiderman.json'
+    #     last_response.must_be :ok?
+    #   end
+    # end
 
 
     it 'should return 404 for unknown movies' do

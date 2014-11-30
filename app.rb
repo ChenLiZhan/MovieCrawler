@@ -37,12 +37,8 @@ class MovieCrawlerApp < Sinatra::Base
           'type' => 'movie_info',
           'info' => []
         }
-        begin
-          movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
-          movie_crawled
-        rescue
-          halt 404
-        end
+        movie_crawled['info'] = MovieCrawler.get_movie_info(moviename)
+        movie_crawled
     end
 
     def get_ranks(category)
