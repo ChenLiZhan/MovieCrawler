@@ -4,6 +4,7 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'movie_crawler'
 gem 'json'
+gem 'httparty'
 
 gem 'activerecord'
 gem 'sinatra-activerecord'
