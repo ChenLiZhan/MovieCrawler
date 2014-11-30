@@ -47,7 +47,7 @@ table
 {
   border-collapse: collapse;
   text-align: center;
-  background: #FAFAFA;
+  background: #1E3347;
   border: 1px solid #4d8bb2;
     
 }
@@ -55,12 +55,13 @@ table
 table.center {
   margin-left:auto;
   margin-right:auto;
+  /*background-color: blue;*/
 }
 
 th, td
 {
   text-align: center;
-  background: #FAFAFA;
+  background: #1E3347;
   border: 1px solid #4d8bb2;
 }
 
@@ -270,4 +271,5 @@ form .submit
 
 .container p {
   line-height: 1.4em;
+  /*color:black;*/
 }
