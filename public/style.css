@@ -81,6 +81,7 @@ div.flash {
 /*Menu*/
 #menu #js_navigation ul
 {
+  height:100px;
   text-align: center;
 }
 
