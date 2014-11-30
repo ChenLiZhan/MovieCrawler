@@ -6,6 +6,7 @@ require 'yaml'
 # require 'sinatra/namespace'
 require 'haml'
 require 'sinatra/simple-navigation'
+require 'sinatra/flash'
 require_relative 'model/movie'
 require_relative 'model/theater'
 
