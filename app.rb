@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
+require 'sinatra/flash'
 require 'yaml'
 # require 'sinatra/namespace'
 require 'haml'
