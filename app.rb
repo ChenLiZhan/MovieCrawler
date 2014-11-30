@@ -1,11 +1,13 @@
 require 'sinatra/base'
 require 'movie_crawler'
 require 'json'
+require 'sinatra/flash'
 require 'yaml'
 # require 'sinatra/namespace'
 require 'haml'
 require 'sinatra/simple-navigation'
 require 'sinatra/flash'
+require 'httparty'
 require_relative 'model/movie'
 require_relative 'model/theater'
 
@@ -19,7 +21,7 @@ class MovieCrawlerApp < Sinatra::Base
   SimpleNavigation.config_file_paths << File.expand_path('../config', __FILE__)
   # register Sinatra::Namespace
 
-  API_BASE_URI = 'http://localhost:9292'
+  API_BASE_URI = 'http://localhost:4567'
 
   helpers do
     # RANK_LIST = { '1' => 'U.S.', '2' => 'Taiwan', '3' => 'DVD' }
@@ -95,15 +97,18 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   post '/movie' do
-    if params[:movie].split(/[\r\n\s]/).length > 1
-      flash[:notice] = 'One movie at a time, take easy!'
-      redirect '/movie'
-      return nil
-    end
+    # if params[:movie].split(/[\r\n\s]/).length > 1
+    #   flash[:notice] = 'One movie at a time, take easy!'
+    #   redirect '/movie'
+    #   return nil
+    # end
 
     movie = params[:movie].strip
-    request_url = "#{API_BASE_URI}/api/v2/movie/#{movie}"
-    result = HTTParty.get(request_url)
+    request_url = "#{API_BASE_URI}/api/v2/movie/#{movie}.json"
+    options = { 
+      headers: { 'Content-Type' => 'application/json' }
+    }
+    result = HTTParty.get(request_url, options)
 
     if (result.code != 200)
       flash[:notice] = 'Movie not found'
@@ -122,10 +127,10 @@ class MovieCrawlerApp < Sinatra::Base
       @results = JSON.parse(session[:result])
       @movie = session[:movie]
     else
-      request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}"
+      request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}.json"
       result = HTTParty.get(request_url)
-      @results = result
-      @movie = params[:movie]
+      @results = YAML.load(result['info'])
+      @id = params[:id]
     end
 
     @action = :update
@@ -133,7 +138,7 @@ class MovieCrawlerApp < Sinatra::Base
   end
 
   delete '/movie/:movie' do
-    request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}"
+    request_url = "#{API_BASE_URI}/api/v2/movie/#{params[:movie]}.json"
     result = HTTParty.delete(request_url)
     flash[:notice] = 'Record of movie deleted'
     redirect '/movie'
@@ -143,10 +148,11 @@ class MovieCrawlerApp < Sinatra::Base
 
   get '/api/v2/movie/:name.json' do
     content_type :json, charset: 'utf-8'
-
-    if Movie.find_by(moviename: params[:name])
+    movie = Movie.find_by(moviename: params[:name])
+    if movie
       # return "find"+params[:name]
-      redirect "/api/v2/moviechecked/#{params[:name]}"
+      # redirect "/api/v2/moviechecked/#{params[:name]}"
+      movie.movieinfo
     else
       movie = Movie.new
       movie.moviename = params[:name]
@@ -156,10 +162,10 @@ class MovieCrawlerApp < Sinatra::Base
     end
   end
 
-  get '/api/v2/moviechecked/:moviename' do
+  get '/api/v2/moviechecked/:id' do
     content_type :json, charset: 'utf-8'
 
-    @movie = Movie.find_by(moviename: params[:moviename])
+    @movie = Movie.find_by(id: params[:id])
     return @movie.movieinfo
   end
 
