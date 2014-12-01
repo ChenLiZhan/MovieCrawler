@@ -79,6 +79,8 @@ class MovieCrawlerApp < Sinatra::Base
     end
   end
 
+  after { ActiveRecord::Base.connection.close }
+
   get '/' do
     haml :home
   end
