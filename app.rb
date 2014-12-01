@@ -14,7 +14,8 @@ require_relative 'model/theater'
 # web version of MovieCrawlerApp(https://github.com/ChenLiZhan/SOA-Crawler)
 class MovieCrawlerApp < Sinatra::Base
   set :views, Proc.new { File.join(root, "views") }
-  enable :sessions
+  # enable :sessions
+  use Rack::Session::Pool
   register Sinatra::Flash
   use Rack::MethodOverride
   register Sinatra::SimpleNavigation
@@ -107,11 +108,15 @@ class MovieCrawlerApp < Sinatra::Base
     # end
 
     movie = params[:movie].strip
-    request_url = "#{API_BASE_URI}/api/v2/movie/#{movie}.json"
-    options = { 
-      headers: { 'Content-Type' => 'application/json' }
+    request_url = "#{API_BASE_URI}/api/v2/movie"
+    param = {
+      movie: movie
     }
-    result = HTTParty.get(request_url, options)
+    options = { 
+      headers: { 'Content-Type' => 'application/json' },
+      body: param.to_json
+    }
+    result = HTTParty.post(request_url, options)
 
     # if (result.code != 200 && result.code != 302)
     #   flash[:notice] = 'Movie not found'
@@ -150,8 +155,17 @@ class MovieCrawlerApp < Sinatra::Base
 
   # # namespace '/api/v1' do
 
-  get '/api/v2/movie/:name.json' do
+  post '/api/v2/movie' do
     content_type :json, charset: 'utf-8'
+
+    body = request.body.read
+    begin
+      req = JSON.parse(body)
+      logger.info req
+    rescue Exception => e
+      puts e.message
+      halt 400
+    end
     # movie = Movie.find_by(moviename: params[:name])
     # if movie
     #   # return "find"+params[:name]
@@ -164,11 +178,11 @@ class MovieCrawlerApp < Sinatra::Base
     #   movie.save
     #   movie.movieinfo
     # end
-    movie = Movie.find_by(moviename: params[:name])
-    unless movie
+    movie = Movie.find_by(moviename: req['movie'])
+    if movie.nil?
       movie = Movie.new
-      movie.moviename = params[:name]
-      movie.movieinfo = get_movie_info(params[:name]).to_json
+      movie.moviename = req['movie']
+      movie.movieinfo = get_movie_info(req['movie']).to_json
       movie.save
     end
 
@@ -181,6 +195,10 @@ class MovieCrawlerApp < Sinatra::Base
     movie = Movie.find(params[:id])
     logger.info "result: #{movie.movieinfo}\n"
     movie.movieinfo
+  end
+
+  delete '/api/v2/moviechecked/:id' do
+    Movie.destroy(params[:id])
   end
 
   get '/api/v2/:type/:category.json' do
